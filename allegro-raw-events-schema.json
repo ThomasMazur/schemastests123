@@ -1,0 +1,154 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"title": "Generic event schema V1",
+	"$id": "allegro-raw-events-schema",
+	"type": "object",
+	"properties": {
+		"context": {
+			"type": "string",
+			"const": "smerp-allegro-raw-events",
+			"description": ""
+		},
+		"id": {
+			"type": "string"
+		},
+		"created_at": {
+			"type": "string",
+			"format": "date-time"
+		},
+		"subject": {
+			"type": "object",
+			"properties": {
+				"order": {
+					"type": "object",
+					"properties": {
+						"id": {
+							"type": "string"
+						},
+						"context": {
+							"type": "string",
+							"const": "allegro"
+						}
+					},
+					"additionalProperties": false,
+					"required": [ "id", "context" ]
+				},
+				"connection": {
+					"type": "object",
+					"properties": {
+						"context": {
+							"type": "string",
+							"const": "smerp-auth"
+						},
+						"id": {
+							"type": "string"
+						}
+					},
+					"required": [ "context", "id" ]
+				}
+			},
+			"additionalProperties": false,
+			"required": [ "connection", "order" ]
+		},
+		"event": {
+			"oneOf": [
+				{
+					"type": "object",
+					"properties": {
+						"type": {
+							"enum": [ "order-created" ]
+						},
+						"payload": {
+							"$ref": "#/$defs/order-all"
+						}
+					},
+					"additionalProperties": false,
+					"required": [ "type", "payload" ]
+				},
+				{
+					"type": "object",
+					"properties": {
+						"type": {
+							"enum": [ "order-delivery-updated" ]
+						},
+						"payload": {
+							"$ref": "#/$defs/order-fragment-delivery"
+						}
+					},
+					"additionalProperties": false,
+					"required": [ "type", "payload" ]
+				},
+				{
+					"type": "object",
+					"properties": {
+						"type": {
+							"enum": [ "order-cancelled" ]
+						},
+						"payload": {
+							"$ref": "#/$defs/order-fragment-cancelled"
+						}
+					},
+					"additionalProperties": false,
+					"required": [ "type", "payload" ]
+				}
+			]
+		},
+		"tags": {
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
+		}
+	},
+	"additionalProperties": false,
+	"required": [ "id", "context", "subject", "event" ],
+	"$defs": {
+		"order-all": {
+			"type": "object",
+			"properties": {
+				"country": {
+					"type": "string"
+				},
+				"city": {
+					"type": "string"
+				},
+				"street": {
+					"type": "string"
+				},
+				"cancalled": {
+					"type": "boolean"
+				}
+			},
+			"required": [ "country", "city", "street", "cancalled" ]
+		},
+		"order-fragment-delivery": {
+			"type": "object",
+			"properties": {
+				"country": {
+					"type": "string"
+				},
+				"city": {
+					"type": "string"
+				},
+				"street": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"required": [ "country", "city", "street" ]
+		},
+		"order-fragment-cancelled": {
+			"type": "object",
+			"properties": {
+				"order-id": {
+					"type": "string"
+				},
+				"cancelled": {
+					"type": "boolean"
+				}
+			},
+			"additionalProperties": false,
+			"required": [ "cancelled" ]
+		}
+	}
+}
